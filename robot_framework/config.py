@@ -13,15 +13,8 @@ SCREENSHOT_SENDER = "robot@friend.dk"
 
 # Constant/Credential names
 ERROR_EMAIL = "Error Email"
+EFLYT_LOGIN = "Eflyt"
 
+QUEUE_NAME = "Udsendelse af orienteringsbrev om godkendelse af flyttesager"
 
-# Queue specific configs
-# ----------------------
-
-# The name of the job queue (if any)
-QUEUE_NAME = None
-
-# The limit on how many queue elements to process
-MAX_TASK_COUNT = 100
-
-# ----------------------
+NOTE_TEXT = "Orientering om godkendelse til anmelder"
