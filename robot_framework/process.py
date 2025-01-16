@@ -214,18 +214,18 @@ def create_kombit_access(orchestrator_connection: OrchestratorConnection) -> Kom
     Returns:
         A KombitAccess object.
     """
-    return KombitAccess("55133018", r"", test=True)  # TODO
-
     # Access Keyvault
     vault_auth = orchestrator_connection.get_credential(config.KEYVAULT_CREDENTIALS)
     vault_uri = orchestrator_connection.get_constant(config.KEYVAULT_URI).value
+
     vault_client = hvac.Client(vault_uri)
-    token = vault_client.auth.approle.login(role_id=vault_auth.username, secret_id=vault_auth.password)
-    vault_client.token = token['auth']['client_token']
+    vault_client.auth.approle.login(role_id=vault_auth.username, secret_id=vault_auth.password)
 
     # Get certificate
     read_response = vault_client.secrets.kv.v2.read_secret_version(mount_point='rpa', path=config.KEYVAULT_PATH, raise_on_deleted_version=True)
     certificate = read_response['data']['data']['cert']
+    if not certificate:
+        raise RuntimeError("Unable to obtain certificate from vault")
 
     # Because KombitAccess requires a file, we save the certificate
     certificate_path = "certificate.pem"
@@ -239,7 +239,7 @@ def send_letter(cpr: str, b64_letter: str, kombit_access: KombitAccess):
     message = create_digital_post_with_main_document(
             label="Godkendelse af flyttesag",
             recipient=Recipient(
-                recipientID="2611740000",  # TODO
+                recipientID=cpr,
                 idType="CPR",
             ),
             sender=Sender(
