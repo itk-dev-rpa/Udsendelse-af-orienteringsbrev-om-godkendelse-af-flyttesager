@@ -14,6 +14,10 @@ SCREENSHOT_SENDER = "robot@friend.dk"
 # Constant/Credential names
 ERROR_EMAIL = "Error Email"
 EFLYT_LOGIN = "Eflyt"
+KEYVAULT_CREDENTIALS = "Keyvault"
+KEYVAULT_URI = "Keyvault URI"
+
+KEYVAULT_PATH = "Godkendelsesbreve_i_eFlyt"
 
 QUEUE_NAME = "Udsendelse af orienteringsbrev om godkendelse af flyttesager"
 
