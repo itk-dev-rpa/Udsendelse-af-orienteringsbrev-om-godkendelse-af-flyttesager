@@ -8,6 +8,7 @@ import base64
 from OpenOrchestrator.orchestrator_connection.connection import OrchestratorConnection
 from OpenOrchestrator.database.queues import QueueStatus
 from itk_dev_shared_components.eflyt import eflyt_login, eflyt_search, eflyt_case
+from itk_dev_shared_components.kmd_nova.authentication import NovaAccess
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.select import Select
@@ -20,6 +21,7 @@ from python_serviceplatformen.authentication import KombitAccess
 import hvac
 
 from robot_framework import config
+from robot_framework.custom import nova
 
 
 def process(orchestrator_connection: OrchestratorConnection) -> None:
@@ -52,7 +54,16 @@ def process(orchestrator_connection: OrchestratorConnection) -> None:
         address = browser.find_element(By.ID, "ctl00_ContentPlaceHolder2_ptFanePerson_stcPersonTab3_lblTiltxt").text
         cpr, name = get_main_applicant(browser)
 
-        b64_letter = generate_letter(name=name, address=address, move_date=move_date, case_number=case)
+        letter_file = generate_letter(name=name, address=address, move_date=move_date, case_number=case)
+        b64_letter = base64.b64encode(letter_file.read()).decode()
+
+        nova_credentials = orchestrator_connection.get_credential(config.NOVA_API)
+        nova_access = NovaAccess(nova_credentials.username, nova_credentials.password)
+        nova_case = nova.create_case(cpr, name, case, nova_access)
+        nova.upload_document(nova_case, nova_access, letter_file, config.DOCUMENT_TITLE)
+
+        eflyt_case.add_note(browser, f"Orienteringsbrev journaliseret i Nova-sag: {nova_case.case_number}")
+
         send_letter(cpr, b64_letter, kombit_access)
 
         print("Hej")
@@ -126,7 +137,7 @@ def get_main_applicant(browser: webdriver.Chrome):
     raise RuntimeError("No main applicant found")
 
 
-def generate_letter(name: str, address: str, move_date: str, case_number: str) -> str:
+def generate_letter(name: str, address: str, move_date: str, case_number: str) -> BytesIO:
     """Generate a pdf letter to send.
 
     Args:
@@ -188,7 +199,7 @@ def generate_letter(name: str, address: str, move_date: str, case_number: str) -
 
     # Convert pdf to base64
     file.seek(0)
-    return base64.b64encode(file.read()).decode()
+    return file
 
 
 def get_date_string() -> str:
