@@ -23,7 +23,7 @@ KEYVAULT_PATH = "Godkendelsesbreve_i_eFlyt"
 
 QUEUE_NAME = "Udsendelse af orienteringsbrev om godkendelse af flyttesager"
 
-NOTE_TEXT = "Orientering om godkendelse til anmelder"
+NOTE_TEXT = "Orientering om godkendelse sendt til anmelder"
 
 # Nova config
 CASEWORKER = Caseworker(

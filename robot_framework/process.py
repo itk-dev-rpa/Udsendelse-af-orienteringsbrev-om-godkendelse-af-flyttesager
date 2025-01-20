@@ -39,15 +39,17 @@ def process(orchestrator_connection: OrchestratorConnection) -> None:
     eflyt_search.search(browser, from_date=from_date, to_date=to_date, case_state="Afsluttet", case_status="Godkendt")
     cases = filter_cases(browser, orchestrator_connection)
 
+    nova_credentials = orchestrator_connection.get_credential(config.NOVA_API)
+    nova_access = NovaAccess(nova_credentials.username, nova_credentials.password)
+
     for case in cases:
-        # TODO
-        # queue_element = orchestrator_connection.create_queue_element(config.QUEUE_NAME)
-        # orchestrator_connection.set_queue_element_status(queue_element.id, QueueStatus.IN_PROGRESS)
+        queue_element = orchestrator_connection.create_queue_element(config.QUEUE_NAME)
+        orchestrator_connection.set_queue_element_status(queue_element.id, QueueStatus.IN_PROGRESS)
 
         eflyt_search.open_case(browser, case)
 
         if not check_case_log(browser):
-            # orchestrator_connection.set_queue_element_status(queue_element.id, QueueStatus.DONE, "Springer over: Sagslog.")
+            orchestrator_connection.set_queue_element_status(queue_element.id, QueueStatus.DONE, "Springer over: Sagslog.")
             continue
 
         move_date = browser.find_element(By.ID, "ctl00_ContentPlaceHolder2_GridViewMovingPersons_ctl02_lnkDateCPR").text
@@ -56,23 +58,17 @@ def process(orchestrator_connection: OrchestratorConnection) -> None:
 
         letter_file = generate_letter(name=name, address=address, move_date=move_date, case_number=case)
         b64_letter = base64.b64encode(letter_file.read()).decode()
-
-        nova_credentials = orchestrator_connection.get_credential(config.NOVA_API)
-        nova_access = NovaAccess(nova_credentials.username, nova_credentials.password)
+        letter_file.seek(0)
         nova_case = nova.create_case(cpr, name, case, nova_access)
-        nova.upload_document(nova_case, nova_access, letter_file, config.DOCUMENT_TITLE)
+        nova.upload_document(nova_case, nova_access, letter_file, f"{config.DOCUMENT_TITLE}.pdf")
 
         eflyt_case.add_note(browser, f"Orienteringsbrev journaliseret i Nova-sag: {nova_case.case_number}")
 
         send_letter(cpr, b64_letter, kombit_access)
 
-        print("Hej")
+        orchestrator_connection.set_queue_element_status(queue_element.id, QueueStatus.DONE, "Brev sendt")
 
-        # orchestrator_connection.set_queue_element_status(queue_element.id, QueueStatus.DONE, "Brev sendt")
-
-        # add_case_log(browser)
-
-    print("Hej")
+        add_case_log(browser)
 
 
 def filter_cases(browser: webdriver.Chrome, orchestrator_connection: OrchestratorConnection) -> list[str]:
@@ -91,7 +87,7 @@ def filter_cases(browser: webdriver.Chrome, orchestrator_connection: Orchestrato
     rows.pop(0)
 
     cases = []
-    for row in rows[:10]:  # TODO
+    for row in rows:
         case_status = row.find_element(By.XPATH, "td[5]").text
         if case_status != "Godkendt":
             continue
@@ -297,6 +293,7 @@ def check_case_log(browser: webdriver.Chrome) -> bool:
         True if the case should be handled. False if the case should be skipped.
     """
     eflyt_case.change_tab(browser, 2)
+    browser.implicitly_wait(0.2)
     log_table = browser.find_element(By.ID, "ctl00_ContentPlaceHolder2_ptFanePerson_sgcPersonTab_GridViewSagslog")
     rows = log_table.find_elements(By.CSS_SELECTOR, "span[id$=_lblHandling]")
 

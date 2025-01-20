@@ -54,6 +54,7 @@ def create_case(ident: str, name: str, eflyt_sag: str, nova_access: NovaAccess) 
     )
 
     nova_cases.add_case(case, nova_access)
+    case = nova_cases.get_case(case.uuid, nova_access)
     return case
 
 
