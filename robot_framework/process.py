@@ -243,6 +243,13 @@ def create_kombit_access(orchestrator_connection: OrchestratorConnection) -> Kom
 
 
 def send_letter(cpr: str, b64_letter: str, kombit_access: KombitAccess):
+    """Send a letter using Digital Post.
+
+    Args:
+        cpr: Recipient ID.
+        b64_letter: Letter as byte string.
+        kombit_access: Acces token for Kombit Serviceportal.
+    """
     message = create_digital_post_with_main_document(
             label="Godkendelse af flyttesag",
             recipient=Recipient(

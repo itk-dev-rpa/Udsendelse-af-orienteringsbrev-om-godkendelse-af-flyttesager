@@ -2,20 +2,11 @@ import uuid
 from typing import BinaryIO
 from datetime import datetime
 
-from OpenOrchestrator.orchestrator_connection.connection import OrchestratorConnection
-
 from itk_dev_shared_components.kmd_nova import nova_cases, nova_documents
 from itk_dev_shared_components.kmd_nova.authentication import NovaAccess
 from itk_dev_shared_components.kmd_nova.nova_objects import NovaCase, CaseParty, Document
 
 from robot_framework import config
-
-
-def get_access(orchestrator_connection: OrchestratorConnection) -> NovaAccess:
-    """Return a nova accesstoken.
-    """
-    nova_credentials = orchestrator_connection.get_credential(config.NOVA_API)
-    return NovaAccess(nova_credentials.username, nova_credentials.password)
 
 
 def create_case(ident: str, name: str, eflyt_sag: str, nova_access: NovaAccess) -> NovaCase:
@@ -59,6 +50,14 @@ def create_case(ident: str, name: str, eflyt_sag: str, nova_access: NovaAccess) 
 
 
 def upload_document(case: NovaCase, nova_access: NovaAccess, file: BinaryIO, file_name: str):
+    """Upload document to Nova and attach to case.
+
+    Args:
+        case: NovaCase to attach document.
+        nova_access: Access token for Nova.
+        file: Document to upload.
+        file_name: Filename for document.
+    """
     document_uuid = nova_documents.upload_document(file, file_name, nova_access)
     document = Document(
         uuid=document_uuid,
