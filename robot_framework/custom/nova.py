@@ -1,3 +1,5 @@
+"""This module contains functions for using the Nova API."""
+
 import uuid
 from typing import BinaryIO
 from datetime import datetime
