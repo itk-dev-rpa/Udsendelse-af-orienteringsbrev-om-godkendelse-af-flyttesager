@@ -35,7 +35,7 @@ CASEWORKER = Caseworker(
 CASE_HEADLINE = "Udsendelse af orienteringsbrev om flyttesag"
 KLE = "23.00.00"
 PROCEEDING_FACET = "G01"
-SENSITIVITY = "Følsomme"
+SENSITIVITY = "Fortrolige"
 
 DOCUMENT_TITLE = "Orienteringsbrev om flyttesag"
 
