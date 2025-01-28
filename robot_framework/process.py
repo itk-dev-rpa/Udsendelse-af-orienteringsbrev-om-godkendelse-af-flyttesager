@@ -51,20 +51,22 @@ def process(orchestrator_connection: OrchestratorConnection) -> None:
         if not check_case_log(browser):
             orchestrator_connection.set_queue_element_status(queue_element.id, QueueStatus.DONE, "Springer over: Sagslog.")
             continue
-
+        
+        # Find data for letter
         move_date = browser.find_element(By.ID, "ctl00_ContentPlaceHolder2_GridViewMovingPersons_ctl02_lnkDateCPR").text
         address = browser.find_element(By.ID, "ctl00_ContentPlaceHolder2_ptFanePerson_stcPersonTab3_lblTiltxt").text
         cpr, name = get_main_applicant(browser)
 
+        # Generate and send letter
         letter_file = generate_letter(name=name, address=address, move_date=move_date, case_number=case)
         b64_letter = base64.b64encode(letter_file.read()).decode()
         letter_file.seek(0)
+        send_letter(cpr, b64_letter, kombit_access)
+
+        # Save letter in Nova
         nova_case = nova.create_case(cpr, name, case, nova_access)
         nova.upload_document(nova_case, nova_access, letter_file, f"{config.DOCUMENT_TITLE}.pdf")
-
         eflyt_case.add_note(browser, f"Orienteringsbrev om godkendelse journaliseret i Nova-sag: {nova_case.case_number}")
-
-        send_letter(cpr, b64_letter, kombit_access)
 
         orchestrator_connection.set_queue_element_status(queue_element.id, QueueStatus.DONE, "Brev sendt")
 
@@ -143,7 +145,7 @@ def generate_letter(name: str, address: str, move_date: str, case_number: str) -
         case_number: The case number in eFlyt.
 
     Returns:
-        A base 64 str representing the letter.
+        The PDF-file as BytesIO
     """
     file = BytesIO()
     c = canvas.Canvas(file, pagesize=A4)
@@ -193,7 +195,6 @@ def generate_letter(name: str, address: str, move_date: str, case_number: str) -
     c.showPage()
     c.save()
 
-    # Convert pdf to base64
     file.seek(0)
     return file
 
