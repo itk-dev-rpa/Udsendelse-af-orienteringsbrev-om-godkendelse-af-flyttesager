@@ -51,7 +51,7 @@ def process(orchestrator_connection: OrchestratorConnection) -> None:
         if not check_case_log(browser):
             orchestrator_connection.set_queue_element_status(queue_element.id, QueueStatus.DONE, "Springer over: Sagslog.")
             continue
-        
+
         # Find data for letter
         move_date = browser.find_element(By.ID, "ctl00_ContentPlaceHolder2_GridViewMovingPersons_ctl02_lnkDateCPR").text
         address = browser.find_element(By.ID, "ctl00_ContentPlaceHolder2_ptFanePerson_stcPersonTab3_lblTiltxt").text
