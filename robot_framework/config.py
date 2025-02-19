@@ -32,8 +32,8 @@ CASEWORKER = Caseworker(
         uuid='203e17a1-0032-4f1d-be98-9386e4f2f336'
 )
 
-CASE_HEADLINE = "Folkeregistrering i almindelighed"
-KLE = "23.05.00"
+CASE_HEADLINE = "Flytteanmeldelse-Godkendt"
+KLE = "23.05.10"
 PROCEEDING_FACET = "G01"
 SENSITIVITY = "Fortrolige"
 
