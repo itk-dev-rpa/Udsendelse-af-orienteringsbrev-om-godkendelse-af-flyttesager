@@ -11,13 +11,12 @@ from itk_dev_shared_components.kmd_nova.nova_objects import NovaCase, CaseParty,
 from robot_framework import config
 
 
-def create_case(ident: str, name: str, eflyt_sag: str, nova_access: NovaAccess) -> NovaCase:
+def create_case(ident: str, name: str, nova_access: NovaAccess) -> NovaCase:
     """Create a Nova case based on email data.
 
     Args:
         ident: The CPR we are looking for
         name: The name of the person we are looking for
-        data_dict: A dictionary object containing the data from the case
         nova_access: An access token for accessing the KMD Nova API
 
     Returns:
@@ -34,9 +33,9 @@ def create_case(ident: str, name: str, eflyt_sag: str, nova_access: NovaAccess) 
 
     case = NovaCase(
         uuid=str(uuid.uuid4()),
-        title=f"{config.CASE_HEADLINE} for eFlyt sag {eflyt_sag}",
+        title=config.CASE_HEADLINE,
         case_date=datetime.now(),
-        progress_state='Opstaaet',
+        progress_state='Afsluttet',
         case_parties=[case_party],
         kle_number=config.KLE,
         proceeding_facet=config.PROCEEDING_FACET,
