@@ -64,7 +64,7 @@ def process(orchestrator_connection: OrchestratorConnection) -> None:
         send_letter(cpr, b64_letter, kombit_access)
 
         # Save letter in Nova
-        nova_case = nova.create_case(cpr, name, case, nova_access)
+        nova_case = nova.create_case(cpr, name, nova_access)
         nova.upload_document(nova_case, nova_access, letter_file, f"{config.DOCUMENT_TITLE}.pdf")
         eflyt_case.add_note(browser, f"Orienteringsbrev om godkendelse journaliseret i Nova-sag: {nova_case.case_number}")
 
