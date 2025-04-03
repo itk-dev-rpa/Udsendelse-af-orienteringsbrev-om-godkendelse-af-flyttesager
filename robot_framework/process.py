@@ -43,7 +43,7 @@ def process(orchestrator_connection: OrchestratorConnection) -> None:
     nova_access = NovaAccess(nova_credentials.username, nova_credentials.password)
 
     for case in cases:
-        queue_element = orchestrator_connection.create_queue_element(config.QUEUE_NAME)
+        queue_element = orchestrator_connection.create_queue_element(config.QUEUE_NAME, case)
         orchestrator_connection.set_queue_element_status(queue_element.id, QueueStatus.IN_PROGRESS)
 
         eflyt_search.open_case(browser, case)
