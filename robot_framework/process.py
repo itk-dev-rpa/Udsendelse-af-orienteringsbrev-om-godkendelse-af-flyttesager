@@ -309,7 +309,7 @@ def check_case_log(browser: webdriver.Chrome) -> bool:
     rows = log_table.find_elements(By.CSS_SELECTOR, "span[id$=_lblHandling]")
 
     for row in rows:
-        if row.text == config.NOTE_TEXT:
+        if row.text in config.NOTE_TEXT:
             return False
 
     return True
