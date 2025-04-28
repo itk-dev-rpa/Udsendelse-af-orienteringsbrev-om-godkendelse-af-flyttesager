@@ -43,6 +43,9 @@ def process(orchestrator_connection: OrchestratorConnection) -> None:
     nova_access = NovaAccess(nova_credentials.username, nova_credentials.password)
 
     for case in cases:
+        if not check_queue(case, orchestrator_connection):
+            continue
+
         queue_element = orchestrator_connection.create_queue_element(config.QUEUE_NAME, case)
         orchestrator_connection.set_queue_element_status(queue_element.id, QueueStatus.IN_PROGRESS)
 
@@ -306,8 +309,36 @@ def check_case_log(browser: webdriver.Chrome) -> bool:
     rows = log_table.find_elements(By.CSS_SELECTOR, "span[id$=_lblHandling]")
 
     for row in rows:
-        if row.text == config.NOTE_TEXT:
+        if row.text in config.NOTE_TEXT:
             return False
+
+    return True
+
+
+def check_queue(case_number: str, orchestrator_connection: OrchestratorConnection) -> bool:
+    """Check if a case has been handled before by checking the job queue i Orchestrator.
+
+    Args:
+        case_number: The case number to check.
+        orchestrator_connection: The connection to Orchestrator.
+
+    Return:
+        bool: True if the element should be handled, False if it should be skipped.
+    """
+    queue_elements = orchestrator_connection.get_queue_elements(queue_name=config.QUEUE_NAME, reference=case_number)
+
+    if len(queue_elements) == 0:
+        return True
+
+    # If the case has been tried more than once before skip it
+    if len(queue_elements) > 1:
+        orchestrator_connection.log_info("Skipping: Case has failed in the past.")
+        return False
+
+    # If it has been marked as done, skip it
+    if queue_elements[0].status == QueueStatus.DONE:
+        orchestrator_connection.log_info("Skipping: Case already marked as done.")
+        return False
 
     return True
 
