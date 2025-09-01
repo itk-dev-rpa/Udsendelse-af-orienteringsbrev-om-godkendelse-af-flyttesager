@@ -8,6 +8,7 @@ import base64
 from OpenOrchestrator.orchestrator_connection.connection import OrchestratorConnection
 from OpenOrchestrator.database.queues import QueueStatus
 from itk_dev_shared_components.eflyt import eflyt_login, eflyt_search, eflyt_case
+from itk_dev_shared_components.eflyt.eflyt_case import Case
 from itk_dev_shared_components.kmd_nova.authentication import NovaAccess
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -37,7 +38,10 @@ def process(orchestrator_connection: OrchestratorConnection) -> None:
     to_date = datetime.today().date()
 
     eflyt_search.search(browser, from_date=from_date, to_date=to_date, case_state="Afsluttet", case_status="Godkendt")
-    cases = filter_cases(browser, orchestrator_connection)
+    cases = eflyt_search.extract_cases(browser)
+    orchestrator_connection.log_info(f"Total cases found: {len(cases)}")
+    cases = filter_cases(cases)
+    orchestrator_connection.log_info(f"Relevant cases found: {len(cases)}")
 
     nova_credentials = orchestrator_connection.get_credential(config.NOVA_API)
     nova_access = NovaAccess(nova_credentials.username, nova_credentials.password)
@@ -49,7 +53,7 @@ def process(orchestrator_connection: OrchestratorConnection) -> None:
         queue_element = orchestrator_connection.create_queue_element(config.QUEUE_NAME, case)
         orchestrator_connection.set_queue_element_status(queue_element.id, QueueStatus.IN_PROGRESS)
 
-        eflyt_search.open_case(browser, case)
+        eflyt_search.open_case(browser, case.case_number)
 
         if not check_case_log(browser):
             orchestrator_connection.set_queue_element_status(queue_element.id, QueueStatus.DONE, "Springer over: Sagslog.")
@@ -76,35 +80,22 @@ def process(orchestrator_connection: OrchestratorConnection) -> None:
         add_case_log(browser)
 
 
-def filter_cases(browser: webdriver.Chrome, orchestrator_connection: OrchestratorConnection) -> list[str]:
-    """Find cases in the case list that have the status "Godkendt".
-    Also filter away cases that are already 'Done' in the orchestrator queue.
+def filter_cases(cases: list[Case]) -> list[Case]:
+    """Filter cases from the case table.
 
     Args:
-        browser: The webdriver object to perform the action.
-        orchestrator_connection: The connection to Orchestrator.
+        cases: A list of cases to filter.
 
     Returns:
-        A list of case numbers to handle.
+        A list of filtered case objects.
     """
-    table = browser.find_element(By.ID, "ctl00_ContentPlaceHolder2_GridViewSearchResult")
-    rows = table.find_elements(By.TAG_NAME, "tr")
-    rows.pop(0)
+    ignored_case_types = ["Børneflytning 1", "Børneflytning 2", "Børneflytning 3", "Mindreårig", "Barn"]
+    filtered_cases = [
+        case for case in cases
+        if not any(case_type in case.case_types for case_type in ignored_case_types) and case.status == "Godkendt"
+    ]
 
-    cases = []
-    for row in rows:
-        case_status = row.find_element(By.XPATH, "td[5]").text
-        if case_status != "Godkendt":
-            continue
-
-        case_number = row.find_element(By.XPATH, "td[3]").text
-
-        if orchestrator_connection.get_queue_elements(config.QUEUE_NAME, reference=case_number, status=QueueStatus.DONE, limit=1):
-            continue
-
-        cases.append(case_number)
-
-    return cases
+    return filtered_cases
 
 
 def get_main_applicant(browser: webdriver.Chrome):
