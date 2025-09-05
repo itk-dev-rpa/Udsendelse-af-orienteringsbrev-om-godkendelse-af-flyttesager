@@ -89,7 +89,7 @@ def filter_cases(cases: list[Case]) -> list[Case]:
     Returns:
         A list of filtered case objects.
     """
-    ignored_case_types = ["Børneflytning 1", "Børneflytning 2", "Børneflytning 3", "Mindreårig", "Barn"]
+    ignored_case_types = ["Børneflytning 1", "Børneflytning 2", "Børneflytning 3", "Mindreårig", "Barn", "Udland"]
     filtered_cases = [
         case for case in cases
         if not any(case_type in case.case_types for case_type in ignored_case_types) and case.status == "Godkendt"
