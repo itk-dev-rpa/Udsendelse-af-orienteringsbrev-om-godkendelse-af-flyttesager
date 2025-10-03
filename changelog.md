@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Filtering now removes child cases and foreign moves.
 
+## [1.1.3] - 2025-05-28
+
+### Fixed
+
+- Updated serviceplatformen to v3.
+
 ## [1.1.2] - 2025-04-11
 
 ### Added
@@ -40,5 +46,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [1.1.4]: https://github.com/itk-dev-rpa/Udsendelse-af-orienteringsbrev-om-godkendelse-af-flyttesager/releases/tag/1.1.4
 [1.1.3]: https://github.com/itk-dev-rpa/Udsendelse-af-orienteringsbrev-om-godkendelse-af-flyttesager/releases/tag/1.1.3
+[1.1.2]: https://github.com/itk-dev-rpa/Udsendelse-af-orienteringsbrev-om-godkendelse-af-flyttesager/releases/tag/1.1.2
+[1.1.1]: https://github.com/itk-dev-rpa/Udsendelse-af-orienteringsbrev-om-godkendelse-af-flyttesager/releases/tag/1.1.1
 [1.1.0]: https://github.com/itk-dev-rpa/Udsendelse-af-orienteringsbrev-om-godkendelse-af-flyttesager/releases/tag/1.1.0
 [1.0.0]: https://github.com/itk-dev-rpa/Udsendelse-af-orienteringsbrev-om-godkendelse-af-flyttesager/releases/tag/1.0.0
