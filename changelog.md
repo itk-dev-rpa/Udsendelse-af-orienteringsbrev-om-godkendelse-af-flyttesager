@@ -38,5 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial release
 
-[1.1.0]: https://github.com/itk-dev-rpa/Udsendelse-af-orienteringsbrev-om-godkendelse-af-flyttesager/releases/tag/1.0.0
+[1.1.4]: https://github.com/itk-dev-rpa/Udsendelse-af-orienteringsbrev-om-godkendelse-af-flyttesager/releases/tag/1.1.4
+[1.1.3]: https://github.com/itk-dev-rpa/Udsendelse-af-orienteringsbrev-om-godkendelse-af-flyttesager/releases/tag/1.1.3
+[1.1.0]: https://github.com/itk-dev-rpa/Udsendelse-af-orienteringsbrev-om-godkendelse-af-flyttesager/releases/tag/1.1.0
 [1.0.0]: https://github.com/itk-dev-rpa/Udsendelse-af-orienteringsbrev-om-godkendelse-af-flyttesager/releases/tag/1.0.0
