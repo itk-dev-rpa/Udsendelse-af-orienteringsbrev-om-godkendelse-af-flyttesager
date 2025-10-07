@@ -47,7 +47,7 @@ def process(orchestrator_connection: OrchestratorConnection) -> None:
     nova_access = NovaAccess(nova_credentials.username, nova_credentials.password)
 
     for case in cases:
-        if not check_queue(case, orchestrator_connection):
+        if not check_queue(case.case_number, orchestrator_connection):
             continue
 
         queue_element = orchestrator_connection.create_queue_element(config.QUEUE_NAME, case)
