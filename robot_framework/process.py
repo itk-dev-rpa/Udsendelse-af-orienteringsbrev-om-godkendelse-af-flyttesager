@@ -50,7 +50,7 @@ def process(orchestrator_connection: OrchestratorConnection) -> None:
         if not check_queue(case.case_number, orchestrator_connection):
             continue
 
-        queue_element = orchestrator_connection.create_queue_element(config.QUEUE_NAME, case)
+        queue_element = orchestrator_connection.create_queue_element(config.QUEUE_NAME, case.case_number)
         orchestrator_connection.set_queue_element_status(queue_element.id, QueueStatus.IN_PROGRESS)
 
         eflyt_search.open_case(browser, case.case_number)
@@ -65,7 +65,7 @@ def process(orchestrator_connection: OrchestratorConnection) -> None:
         cpr, name = get_main_applicant(browser)
 
         # Generate and send letter
-        letter_file = generate_letter(name=name, address=address, move_date=move_date, case_number=case)
+        letter_file = generate_letter(name=name, address=address, move_date=move_date, case_number=case.case_number)
         b64_letter = base64.b64encode(letter_file.read()).decode()
         letter_file.seek(0)
         send_letter(cpr, b64_letter, kombit_access)
