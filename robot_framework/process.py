@@ -1,6 +1,5 @@
 """This module contains the main process of the robot."""
 
-import os
 from datetime import datetime, timedelta
 from io import BytesIO
 import base64
