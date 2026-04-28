@@ -337,5 +337,5 @@ def check_queue(case_number: str, orchestrator_connection: OrchestratorConnectio
 if __name__ == '__main__':
     conn_string = os.getenv("OpenOrchestratorConnString")
     crypto_key = os.getenv("OpenOrchestratorKey")
-    oc = OrchestratorConnection("Eflyt Test", conn_string, crypto_key, "")
+    oc = OrchestratorConnection("Eflyt Test", conn_string, crypto_key, "", "", "")
     process(oc)
